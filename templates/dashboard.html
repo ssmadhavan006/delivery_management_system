@@ -1,0 +1,19 @@
+<h2>Orders</h2>
+
+<h3>Welcome {{ user }}</h3>
+
+<a href="/logout">Logout</a>
+
+<form action="/create_order" method="post">
+    <input type="text" name="address" placeholder="Enter address">
+    <button type="submit">Add Order</button>
+</form>
+
+<ul>
+{% for order in orders %}
+    <li>
+        Address: {{ order[1] }} | Status: {{ order[2] }}
+        <a href="/update_status/{{ order[0] }}">Mark Delivered</a>
+    </li>
+{% endfor %}
+</ul>
