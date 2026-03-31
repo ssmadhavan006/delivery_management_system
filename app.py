@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, redirect, session
 from db import get_db
 
 app = Flask(__name__)
-app.secret_key = "secret"   # needed for session
+app.secret_key = "secret"
+
 
 @app.route('/')
 def home():
@@ -23,7 +24,7 @@ def login():
     user = cursor.fetchone()
     
     if user:
-        session['user'] = email   # store logged-in user
+        session['user'] = email
         return redirect('/dashboard')
     
     return "Invalid login"
@@ -31,16 +32,20 @@ def login():
 
 @app.route('/dashboard')
 def dashboard():
-    # protect route
     if 'user' not in session:
         return redirect('/')
     
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM orders")
+
+    email = session['user']
+    cursor.execute(
+        "SELECT * FROM orders WHERE customer_email=%s",
+        (email,)
+    )
     orders = cursor.fetchall()
     
-    return render_template('dashboard.html', orders=orders)
+    return render_template('dashboard.html', orders=orders, user=email)
 
 
 @app.route('/create_order', methods=['POST'])
@@ -49,12 +54,13 @@ def create_order():
         return redirect('/')
     
     address = request.form['address']
+    email = session['user']
     
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        "INSERT INTO orders (address, status) VALUES (%s, %s)",
-        (address, 'Pending')
+        "INSERT INTO orders (address, status, customer_email) VALUES (%s, %s, %s)",
+        (address, 'Pending', email)
     )
     db.commit()
     
