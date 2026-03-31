@@ -9,11 +9,15 @@
     <button type="submit">Add Order</button>
 </form>
 
-<ul>
-{% for order in orders %}
-    <li>
-        Address: {{ order[1] }} | Status: {{ order[2] }}
-        <a href="/update_status/{{ order[0] }}">Mark Delivered</a>
-    </li>
-{% endfor %}
-</ul>
+{% if orders %}
+    <ul>
+    {% for order in orders %}
+        <li>
+            Address: {{ order[1] }} | Status: {{ order[2] }}
+            <a href="/update_status/{{ order[0] }}">Mark Delivered</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No orders yet</p>
+{% endif %}
